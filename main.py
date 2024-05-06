@@ -1,7 +1,12 @@
 import tkinter
+from io import BytesIO
+
 import customtkinter
 import pytube
 from pytube import YouTube
+
+from PIL import Image, ImageTk
+import requests
 
 SAVE_PATH = '/home/collyne/Downloads'
 
@@ -13,7 +18,7 @@ def startDownload():
         yt_object = YouTube(yt_link, on_progress_callback=on_progress)
         video = yt_object.streams.get_highest_resolution()
         video.download(SAVE_PATH)
-        print(yt_object.thumbnail_url)
+        setThumbnail(yt_object.thumbnail_url)
         # Finished downloading label
         showText.configure(text="Download Complete", text_color="green")
 
@@ -39,8 +44,31 @@ def on_progress(stream, chunk, bytes_remaining):
     pPercentage.configure(text=per + '%')
     pPercentage.update()
 
-#     update progress bar
+    #     update progress bar
     progressBar.set(float(percentage_downloaded / 100))
+
+
+def setThumbnail(thumbnail_url):
+    try:
+        response = requests.get(thumbnail_url)
+        if response.status_code == 200:
+            # Convert the response content to bytes
+            image_data = BytesIO(response.content)
+            # Open the image using PIL/Pillow
+            pil_image = Image.open(image_data)
+            # Convert the PIL image to Tkinter PhotoImage
+            tk_image = ImageTk.PhotoImage(pil_image)
+            # Display the image in a Tkinter label
+            thumbnail_label = customtkinter.CTkLabel(image=tk_image)
+            thumbnail_label.pack()
+            # Keep a reference to the image to prevent it from being garbage collected
+            thumbnail_label.image = tk_image
+        else:
+            # Error downloading image
+            showText.configure(text="Failed to download thumbnail!", text_color="red")
+    except Exception as e:
+        # Other exceptions
+        showText.configure(text="An error occurred: " + str(e), text_color="red")
 
 
 # system settings
@@ -69,8 +97,6 @@ button_download.pack(padx=5, pady=5)
 
 showText = customtkinter.CTkLabel(app, text="")
 showText.pack(padx=5, pady=5)
-
-
 
 # Progress bar
 pPercentage = customtkinter.CTkLabel(app, text="0 %")
