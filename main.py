@@ -4,31 +4,11 @@ import pytube
 from pytube import YouTube
 
 SAVE_PATH = '/home/collyne/Downloads'
+YT_OBJECT = None
+VIDEO_FOUND = None
 
 
-def startDownload():
-    try:
-        showText.configure(text="")
-        yt_link = link.get()
-        yt_object = YouTube(yt_link, on_progress_callback=on_progress)
-        video = yt_object.streams.get_highest_resolution()
-        video.download(SAVE_PATH)
-        print(yt_object.thumbnail_url)
-        # Finished downloading label
-        showText.configure(text="Download Complete", text_color="green")
-
-    except pytube.exceptions.RegexMatchError:
-
-        showText.configure(text="Invalid YouTube link!", text_color="red")
-
-    except pytube.exceptions.VideoUnavailable:
-
-        showText.configure(text="Video is unavailable!", text_color="red")
-
-    except Exception as e:
-
-        showText.configure(text="An error occurred: " + str(e), text_color="red")
-
+# noinspection PyUnresolvedReferences
 
 def on_progress(stream, chunk, bytes_remaining):
     total_size = stream.filesize
@@ -39,13 +19,59 @@ def on_progress(stream, chunk, bytes_remaining):
     pPercentage.configure(text=per + '%')
     pPercentage.update()
 
-#     update progress bar
+    #     update progress bar
     progressBar.set(float(percentage_downloaded / 100))
 
 
+# noinspection PyUnusedLocal
+def searchVideo():
+    try:
+        showError_Success.configure(text="")
+        yt_link = link.get()
+        YT_OBJECT = YouTube(yt_link, on_progress_callback=on_progress)
+        VIDEO_FOUND = YT_OBJECT.streams.get_highest_resolution()
+
+        # display download button
+        button_frame.pack(pady=10) # embedd frame
+        button_download.pack(side="left", padx=5)
+
+        # show details here
+        print(YT_OBJECT.thumbnail_url)
+
+    except pytube.exceptions.RegexMatchError:
+        showError_Success.configure(text="Invalid YouTube link!", text_color="red")
+
+    except pytube.exceptions.VideoUnavailable:
+        showError_Success.configure(text="Video is unavailable!", text_color="red")
+
+    except Exception as e:
+        showError_Success.configure(text="An error occurred: " + str(e), text_color="red")
+
+
+def startDownload():
+    try:
+        VIDEO_FOUND.download(SAVE_PATH)
+        pPercentage.pack(padx=5, pady=5)
+        progressBar.pack(padx=5, pady=5)
+
+        # Finished downloading label
+        showError_Success.configure(text="Download Complete", text_color="green")
+
+    except:
+        showError_Success.configure(text="Video is unavailable!", text_color="red")
+
+
+
+def clearEntry():
+    url_var.set("")
+    showError_Success.configure(text="")
+
+
+# initialise elements
+
 # system settings
 customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("blue")
+customtkinter.set_default_color_theme("green")
 
 # app frame
 app = customtkinter.CTk()
@@ -56,29 +82,49 @@ app.title("YouTube Downloader")
 title = customtkinter.CTkLabel(app, text="Enter youtube link")
 title.pack(padx=5, pady=5)
 
+# Create a Frame to contain the buttons
+textEntry_frame = customtkinter.CTkFrame(app)
+textEntry_frame.pack(pady=10)  # Adjust pady as needed
+
 # link
 url_var = tkinter.StringVar()
-link = customtkinter.CTkEntry(app, width=350, height=40, textvariable=url_var)
-link.pack()
+link = customtkinter.CTkEntry(textEntry_frame, width=350, height=40, textvariable=url_var)
 
-# Download Button
-button_download = customtkinter.CTkButton(app, text="Download", command=startDownload)
-button_download.pack(padx=5, pady=5)
+# First Download Button
+clearButton = customtkinter.CTkButton(textEntry_frame, width=50, height=40, text="clear", command=clearEntry)
+
+# First Download Button
+searchButton = customtkinter.CTkButton(textEntry_frame, height=40, text="search", command=searchVideo)
+
+# Create a Frame to contain the buttons
+button_frame = customtkinter.CTkFrame(app)
+
+
+# Second Download Button
+button_download = customtkinter.CTkButton(button_frame, text="Download", command=startDownload)
+
 
 # Show text output
 
-showText = customtkinter.CTkLabel(app, text="")
-showText.pack(padx=5, pady=5)
-
-
-
+showError_Success = customtkinter.CTkLabel(app, text="")
+showError_Success.pack(padx=5, pady=5)
+#
 # Progress bar
 pPercentage = customtkinter.CTkLabel(app, text="0 %")
-pPercentage.pack(padx=5, pady=5)
+
 
 progressBar = customtkinter.CTkProgressBar(app, width=350)
 progressBar.set(0)
-progressBar.pack(padx=5, pady=5)
+
+
 
 # run app
-app.mainloop()
+def startMain():
+    link.pack(side="left", padx=5)
+    clearButton.pack(side="left", padx=5)
+    searchButton.pack(side="left", padx=5)
+
+    app.mainloop()
+
+
+startMain()
