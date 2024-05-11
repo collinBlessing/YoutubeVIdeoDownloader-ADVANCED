@@ -7,6 +7,9 @@ import requests
 from pytube import YouTube
 import threading
 
+
+import io
+
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
@@ -37,7 +40,6 @@ def searchVideo():
     button_download.pack_forget()
     progressBar.pack_forget()
 
-
     # Clear the error message
     showError_Success.configure(text="")
 
@@ -51,6 +53,9 @@ def searchVideo():
     pPercentage.configure(text="0 %")
     pPercentage.pack_forget()
     button_frame.pack_forget()
+
+    # Update the window size to fit the new layout
+    app.update_idletasks()
 
     # Set the progress bar to zero
     progressBar.set(0)
@@ -133,18 +138,27 @@ def clearEntry():
 
 
 def displayImage_and_details():
-
-    # display thumbnail image
+    # Display thumbnail image
     imageUrl = YT_OBJECT.thumbnail_url
     u = urlopen(imageUrl)
     raw_data = u.read()
     u.close()
-    # append to the label
-    photo = ImageTk.PhotoImage(data=raw_data)
+
+    # Open image using PIL
+    image = Image.open(io.BytesIO(raw_data))
+
+    # Resize image
+    resized_image = image.resize((200, 150))  # Adjust the size as needed
+
+    # Convert image to PhotoImage
+    photo = ImageTk.PhotoImage(resized_image)
+
+    # Create label with the resized image
     label = tk.Label(details_frame, image=photo)
     label.image = photo
     label.pack()
-    # video title
+
+    # Display video title
     video_title.configure(text=YT_OBJECT.title)
     video_title.pack(padx=5, pady=5)
 
