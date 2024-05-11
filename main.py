@@ -1,4 +1,6 @@
-import tkinter
+import tkinter as tk
+from PIL import Image, ImageTk
+from urllib.request import urlopen
 import customtkinter
 import pytube
 import requests
@@ -34,6 +36,19 @@ def searchVideo():
     # Hide the download button and the progress bar
     button_download.pack_forget()
     progressBar.pack_forget()
+
+
+    # Clear the error message
+    showError_Success.configure(text="")
+
+    # Clear the progress bar
+    progressBar.pack_forget()
+    pPercentage.pack_forget()
+    button_frame.pack_forget()
+
+    # Set the progress bar to zero
+    progressBar.set(0)
+    pPercentage.configure(text="0 %")
     pPercentage.pack_forget()
     button_frame.pack_forget()
 
@@ -52,14 +67,13 @@ def searchVideo():
             YT_OBJECT = YouTube(yt_link, on_progress_callback=on_progress)
             VIDEO_FOUND = YT_OBJECT.streams.get_highest_resolution()
 
-            showError_Success.configure(text="Video found", text_color="yellow")
-
             # display download button
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
 
             # show details here
-            print(YT_OBJECT.thumbnail_url)
+
+            displayImage_and_details()
 
         except pytube.exceptions.RegexMatchError:
             showError_Success.configure(text="Invalid YouTube link!", text_color="red")
@@ -118,6 +132,23 @@ def clearEntry():
     progressBar.set(0)
 
 
+def displayImage_and_details():
+
+    # display thumbnail image
+    imageUrl = YT_OBJECT.thumbnail_url
+    u = urlopen(imageUrl)
+    raw_data = u.read()
+    u.close()
+    # append to the label
+    photo = ImageTk.PhotoImage(data=raw_data)
+    label = tk.Label(details_frame, image=photo)
+    label.image = photo
+    label.pack()
+    # video title
+    video_title.configure(text=YT_OBJECT.title)
+    video_title.pack(padx=5, pady=5)
+
+
 # initialise elements
 
 # system settings
@@ -138,7 +169,7 @@ textEntry_frame = customtkinter.CTkFrame(app)
 textEntry_frame.pack(pady=10)  # Adjust pady as needed
 
 # link
-url_var = tkinter.StringVar()
+url_var = tk.StringVar()
 link = customtkinter.CTkEntry(
     textEntry_frame, width=350, height=40, textvariable=url_var
 )
@@ -175,6 +206,13 @@ pPercentage = customtkinter.CTkLabel(app, text="0 %")
 progressBar = customtkinter.CTkProgressBar(app, width=350)
 progressBar.set(0)
 
+
+# details frame
+details_frame = customtkinter.CTkFrame(app)
+details_frame.pack(pady=10)
+
+# image frame
+video_title = customtkinter.CTkLabel(details_frame, text="")
 
 # run app
 def startMain():
