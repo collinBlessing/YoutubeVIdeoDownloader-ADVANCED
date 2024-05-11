@@ -84,6 +84,8 @@ def searchVideo():
             YT_OBJECT = YouTube(yt_link, on_progress_callback=on_progress)
             VIDEO_FOUND = YT_OBJECT.streams.get_highest_resolution()
 
+            my_option.pack(side="left", padx=5, pady=5)
+
             # display download button
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
@@ -115,13 +117,28 @@ def searchVideo():
 
 def download_thread():
     try:
-        VIDEO_FOUND.download(SAVE_PATH)
-
-        # Update GUI elements
-        showError_Success.configure(text="Download Complete", text_color="green")
-    except Exception as e:
-        # Update GUI elements
+        if my_option.get() == "mp3":
+            audio_stream = VIDEO_FOUND.streams.filter(only_audio=True).first()
+            if audio_stream:
+                audio_stream.download(SAVE_PATH)
+                showError_Success.configure(
+                    text="Download Complete", text_color="green"
+                )
+            else:
+                showError_Success.configure(
+                    text="No audio stream found!", text_color="red"
+                )
+        elif my_option.get() == "mp4":
+            VIDEO_FOUND.download(SAVE_PATH)
+            showError_Success.configure(text="Download Complete", text_color="green")
+    except pytube.exceptions.VideoUnavailable:
         showError_Success.configure(text="Video is unavailable!", text_color="red")
+    except pytube.exceptions.RegexMatchError:
+        showError_Success.configure(text="Invalid YouTube link!", text_color="red")
+    except Exception as e:
+        showError_Success.configure(
+            text="An error occurred: " + str(e), text_color="red"
+        )
         print(e)
 
 
@@ -204,6 +221,7 @@ customtkinter.set_default_color_theme("blue")
 app = customtkinter.CTk()
 app.geometry("720x480")
 app.title("YouTube Downloader")
+# app.iconbitmap("images/logo.ico")
 
 # Adding ui elements
 title = customtkinter.CTkLabel(app, text="Enter youtube link")
@@ -238,6 +256,11 @@ button_download = customtkinter.CTkButton(
     button_frame, text="Download", command=startDownload
 )
 
+file_formats = ["mp4", "mp3"]
+
+# create option menu
+my_option = customtkinter.CTkOptionMenu(button_frame, values=file_formats)
+
 
 # Show text output
 
@@ -271,8 +294,7 @@ def startMain():
     link.pack(side="left", padx=5)
     clearButton.pack(side="left", padx=5)
     searchButton.pack(side="left", padx=5)
-
     app.mainloop()
 
 
-
+startMain()
