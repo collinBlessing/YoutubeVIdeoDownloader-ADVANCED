@@ -198,7 +198,7 @@ def displayImage_and_details():
 
 # system settings
 customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("green")
+customtkinter.set_default_color_theme("blue")
 
 # app frame
 app = customtkinter.CTk()
@@ -248,7 +248,7 @@ showError_Success.pack(padx=5, pady=5)
 pPercentage = customtkinter.CTkLabel(app, text="0 %")
 
 # Progress bar
-progressBar = customtkinter.CTkProgressBar(app, width=350)
+progressBar = customtkinter.CTkProgressBar(app, width=350, height=5)
 progressBar.set(0)
 
 
@@ -265,6 +265,7 @@ details_frame.configure(width=width)
 # image frame
 video_title = customtkinter.CTkLabel(details_frame, text="")
 
+
 # run app
 def startMain():
     link.pack(side="left", padx=5)
@@ -274,4 +275,4 @@ def startMain():
     app.mainloop()
 
 
-startMain()
+
