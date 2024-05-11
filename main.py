@@ -54,11 +54,23 @@ def searchVideo():
     pPercentage.pack_forget()
     button_frame.pack_forget()
 
-    # Update the window size to fit the new layout
-    app.update_idletasks()
-
     # Set the progress bar to zero
     progressBar.set(0)
+
+    # Remove the photo from the details frame
+    for widget in details_frame.winfo_children():
+        widget.pack_forget()
+
+    # Remove the video title
+    video_title.configure(text="")
+
+    details_frame.pack_forget()
+
+    details_frame.pack(pady=10)
+    details_frame.configure(width=width)
+
+    # Update the window size to fit the new layout
+
     try:
         # Send a request to google.com to check for an internet connection
         requests.get("http://google.com", timeout=5)
@@ -138,13 +150,15 @@ def clearEntry():
 
     # Remove the photo from the details frame
     for widget in details_frame.winfo_children():
-        widget.destroy()
+        widget.pack_forget()
 
     # Remove the video title
     video_title.configure(text="")
 
-    # Update the window size to fit the new layout
-    app.update_idletasks()
+    details_frame.pack_forget()
+
+    details_frame.pack(pady=10)
+    details_frame.configure(width=width)
 
 
 def displayImage_and_details():
@@ -172,10 +186,11 @@ def displayImage_and_details():
     video_title.configure(text=YT_OBJECT.title)
     # Display video title
     video_title.configure(
-        text=YT_OBJECT.title, font=("Helvetica", 18, "bold")
+        text=YT_OBJECT.title, font=("Helvetica", 18, "bold"),
+        wraplength=200
     )  # Increase font size
     video_title.pack(
-        side="top", padx=5, pady=(20, 10)
+        side="right", padx=5, pady=(20, 10)
     )  # Display title on the right side with padding
 
 
@@ -239,12 +254,12 @@ progressBar.set(0)
 
 # Adjust the width of the details frame based on the width of other widgets
 width = (
-    link.winfo_reqwidth() + clearButton.winfo_reqwidth() + searchButton.winfo_reqwidth()
+    link.winfo_reqwidth() + clearButton.winfo_reqwidth() + searchButton.winfo_reqwidth() + 20
 )
 
 # details frame
 details_frame = customtkinter.CTkFrame(app)
-details_frame.pack(pady=5)
+details_frame.pack(pady=10)
 details_frame.configure(width=width)
 
 # image frame
