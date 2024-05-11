@@ -136,6 +136,16 @@ def clearEntry():
     # Set the progress bar to zero
     progressBar.set(0)
 
+    # Remove the photo from the details frame
+    for widget in details_frame.winfo_children():
+        widget.destroy()
+
+    # Remove the video title
+    video_title.configure(text="")
+
+    # Update the window size to fit the new layout
+    app.update_idletasks()
+
 
 def displayImage_and_details():
     # Display thumbnail image
@@ -156,11 +166,17 @@ def displayImage_and_details():
     # Create label with the resized image
     label = tk.Label(details_frame, image=photo)
     label.image = photo
-    label.pack()
+    label.pack(side="left")  # Display image on the left side
 
     # Display video title
     video_title.configure(text=YT_OBJECT.title)
-    video_title.pack(padx=5, pady=5)
+    # Display video title
+    video_title.configure(
+        text=YT_OBJECT.title, font=("Helvetica", 18, "bold")
+    )  # Increase font size
+    video_title.pack(
+        side="top", padx=5, pady=(20, 10)
+    )  # Display title on the right side with padding
 
 
 # initialise elements
@@ -221,9 +237,15 @@ progressBar = customtkinter.CTkProgressBar(app, width=350)
 progressBar.set(0)
 
 
+# Adjust the width of the details frame based on the width of other widgets
+width = (
+    link.winfo_reqwidth() + clearButton.winfo_reqwidth() + searchButton.winfo_reqwidth()
+)
+
 # details frame
 details_frame = customtkinter.CTkFrame(app)
-details_frame.pack(pady=10)
+details_frame.pack(pady=5)
+details_frame.configure(width=width)
 
 # image frame
 video_title = customtkinter.CTkLabel(details_frame, text="")
