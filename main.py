@@ -7,7 +7,7 @@ import requests
 from pytube import YouTube
 import threading
 
-
+import os
 import io
 
 SAVE_PATH = "/home/collyne/Downloads"
@@ -41,6 +41,7 @@ def searchVideo():
     progressBar.pack_forget()
 
     # Clear the error message
+    # url_var.set("")
     showError_Success.configure(text="")
 
     # Clear the progress bar
@@ -76,6 +77,7 @@ def searchVideo():
         requests.get("http://google.com", timeout=5)
 
         # If the request succeeds, continue with youtube search
+        showError_Success.configure(text="Searching .....", text_color="yellow")
 
         global YT_OBJECT, VIDEO_FOUND
         try:
@@ -90,8 +92,13 @@ def searchVideo():
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
 
-            # show details here
+            # # Clear the error message
+            # url_var.set("")
+            # showError_Success.configure(text="")
+            # showError_Success.pack()
 
+
+            # show details here
             displayImage_and_details()
 
         except pytube.exceptions.RegexMatchError:
@@ -118,11 +125,14 @@ def searchVideo():
 def download_thread():
     try:
         if my_option.get() == "mp3":
-            audio_stream = VIDEO_FOUND.streams.filter(only_audio=True).first()
+            audio_stream = YT_OBJECT.streams.filter(only_audio=True).first()
             if audio_stream:
-                audio_stream.download(SAVE_PATH)
+                output_file = audio_stream.download(output_path=SAVE_PATH)
+                base, ext = os.path.splitext(output_file)
+                new_file = base+ '.mp3'
+                os.rename(output_file, new_file)
                 showError_Success.configure(
-                    text="Download Complete", text_color="green"
+                    text="Audio download Complete", text_color="green"
                 )
             else:
                 showError_Success.configure(
@@ -130,7 +140,7 @@ def download_thread():
                 )
         elif my_option.get() == "mp4":
             VIDEO_FOUND.download(SAVE_PATH)
-            showError_Success.configure(text="Download Complete", text_color="green")
+            showError_Success.configure(text="Video download Complete", text_color="green")
     except pytube.exceptions.VideoUnavailable:
         showError_Success.configure(text="Video is unavailable!", text_color="red")
     except pytube.exceptions.RegexMatchError:
@@ -140,6 +150,9 @@ def download_thread():
             text="An error occurred: " + str(e), text_color="red"
         )
         print(e)
+            
+        pPercentage.pack(padx=5, pady=5)
+        progressBar.pack(padx=5, pady=5)
 
 
 def startDownload():

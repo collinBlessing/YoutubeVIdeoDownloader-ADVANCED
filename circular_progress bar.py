@@ -1,4 +1,5 @@
 import tkinter as tk
+import customtkinter
 
 
 class CircularProgress(tk.Canvas):
@@ -12,7 +13,7 @@ class CircularProgress(tk.Canvas):
         self.angle = 0
         self.speed = 20
 
-        self.configure(bg="white", highlightthickness=0)
+        self.configure(bg="systemTransparent")
         self.create_oval(
             self.center_x - self.radius,
             self.center_y - self.radius,
@@ -49,8 +50,14 @@ class CircularProgress(tk.Canvas):
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("Circular progress indicator")
-    progress = CircularProgress(root, width=100, height=100)
+    customtkinter.set_appearance_mode("System")
+    customtkinter.set_default_color_theme("blue")
+
+
+
+    root = customtkinter.CTk()
+
+    # root.title("Circular progress indicator")
+    progress = CircularProgress(root, width=60, height=60)
     progress.pack()
     root.mainloop()
