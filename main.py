@@ -310,4 +310,4 @@ def startMain():
     app.mainloop()
 
 
-startMain()
+

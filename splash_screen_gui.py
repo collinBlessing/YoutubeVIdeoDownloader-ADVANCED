@@ -24,19 +24,19 @@ def callMainWindow():
     main.startMain()
 
 
-frame = Frame(w, width=427, height=250, bg="#FF0000")
+frame = Frame(w, width=427, height=250, bg="#000")
 frame.place(x=0, y=0)
-label1 = Label(w, text="Tube Fetch", fg="white", bg="#FF0000")  # decorate it
+label1 = Label(w, text="Tube Fetch", fg="white", bg="#000")  # decorate it
 label1.configure(
     font=("Game Of Squids", 24, "bold")
 )  # You need to install this font in your PC or try another one
-label1.place(x=80, y=90)
+label1.place(x=110, y=70)
 
 # New code for adding the "Developed by" label
-developed_by_text = "Developed by: Your Nahurira Collin Blessing"
-developed_by_label = Label(w, text=developed_by_text, fg="white", bg="#FF0000")
-developed_by_label.configure(font=("Calibri", 10))
-developed_by_label.place(x=70, y=200)
+developed_by_text = "Developed by Nahurira Collin Blessing"
+developed_by_label = Label(w, text=developed_by_text, fg="white", bg="#000")
+developed_by_label.configure(font=("Calibri", 10, "bold"))
+developed_by_label.place(x=75, y=200)
 
 # making animation
 image_a = ImageTk.PhotoImage(Image.open("c2.png"))
@@ -44,7 +44,7 @@ image_b = ImageTk.PhotoImage(Image.open("c1.png"))
 
 
 def animate():
-    for i in range(1):  # 5 loops
+    for i in range(2):  # 5 loops
         l1 = Label(w, image=image_a, border=0, relief=SUNKEN)
         l1.place(x=180, y=145)
         l2 = Label(w, image=image_b, border=0, relief=SUNKEN)
