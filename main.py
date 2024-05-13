@@ -15,6 +15,7 @@ SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
 
+
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
 
 
@@ -35,19 +36,16 @@ def on_progress(stream, chunk, bytes_remaining):
 
 
 def showSearchingText():
+    text.configure(text="searching", text_color="black", bg_color="yellow")
     text.place(x=0, y=0)
-    searching_text.pack(padx=5, pady=5)
-    search_thread = threading.Thread(target=searchVideo)
     search_thread.start()
+
 
 # method to search for video existence on youtube
 def searchVideo():
     # Hide the download button and the progress bar
     button_download.pack_forget()
     progressBar.pack_forget()
-
-    # Clear the error message
-    # url_var.set("")
 
     # Clear the progress bar
     progressBar.pack_forget()
@@ -72,9 +70,6 @@ def searchVideo():
 
     details_frame.pack_forget()
 
-    details_frame.pack(pady=10)
-    details_frame.configure(width=width)
-
     # Update the window size to fit the new layout
 
     try:
@@ -91,31 +86,42 @@ def searchVideo():
 
             my_option.pack(side="left", padx=5, pady=5)
 
-            # display download button
-            button_frame.pack(pady=10)  # embedd frame
-            button_download.pack(side="left", padx=5)
             # show details here
 
             # hide searching
-            searching_text.pack_forget()
+            text.place_forget()
 
             displayImage_and_details()
 
+            # display download button
+            button_frame.pack(pady=10)  # embedd frame
+            button_download.pack(side="left", padx=5)
+
         except pytube.exceptions.RegexMatchError:
-            showError_Success.configure(text="Invalid YouTube link!", text_color="red")
+            text.configure(
+                text="Invalid YouTube link!", text_color="white", bg_color="red"
+            )
+            text.place(x=0, y=0)
 
         except pytube.exceptions.VideoUnavailable:
-            showError_Success.configure(text="Video is unavailable!", text_color="red")
+            text.configure(
+                text="Video is unavailable!", text_color="white", bg_color="red"
+            )
+            text.place(x=0, y=0)
 
         except Exception as e:
-            showError_Success.configure(
-                text="An error occurred: " + str(e), text_color="red"
+            text.configure(
+                text="An error occurred: " + str(e), text_color="white", bg_color="red"
             )
+            text.place(x=0, y=0)
 
             # display error for a poor connection
     except (requests.ConnectionError, requests.Timeout) as exception:
         # If the request fails, show an error message and return
-        showError_Success.configure(text="No internet connection!", text_color="red")
+        text.configure(
+            text="No internet connection!", text_color="white", bg_color="red"
+        )
+        text.place(x=0, y=0)
         return
 
 
@@ -127,30 +133,55 @@ def download_thread():
         if my_option.get() == "mp3":
             audio_stream = YT_OBJECT.streams.filter(only_audio=True).first()
             if audio_stream:
+                text.configure(
+                    text="Downloading ....", text_color="green", bg_color="white"
+                )
+                text.place(x=0, y=0)
                 output_file = audio_stream.download(output_path=SAVE_PATH)
                 base, ext = os.path.splitext(output_file)
                 new_file = base + ".mp3"
                 os.rename(output_file, new_file)
-                showError_Success.configure(
-                    text="Audio download Complete", text_color="green"
+
+                # show message
+                text.configure(
+                    text="Audio download Complete", text_color="white", bg_color="green"
                 )
+                text.place(x=0, y=0)
             else:
-                showError_Success.configure(
-                    text="No audio stream found!", text_color="red"
+                # show message
+                text.configure(
+                    text="No audio stream found!", text_color="white", bg_color="red"
                 )
+                text.place(x=0, y=0)
+
         elif my_option.get() == "mp4":
-            VIDEO_FOUND.download(SAVE_PATH)
-            showError_Success.configure(
-                text="Video download Complete", text_color="green"
+
+            text.configure(
+                text="Downloading ....", text_color="green", bg_color="white"
             )
+            text.place(x=0, y=0)
+
+            VIDEO_FOUND.download(SAVE_PATH)
+            # show message
+            text.configure(
+                text="Video download Complete", text_color="white", bg_color="green"
+            )
+            text.place(x=0, y=0)
+
     except pytube.exceptions.VideoUnavailable:
-        showError_Success.configure(text="Video is unavailable!", text_color="red")
+        # show message
+        text.configure(text="Video is unavailable!", text_color="white", bg_color="red")
+        text.place(x=0, y=0)
     except pytube.exceptions.RegexMatchError:
-        showError_Success.configure(text="Invalid YouTube link!", text_color="red")
+
+        # show message
+        text.configure(text="Invalid Youtube link", text_color="white", bg_color="red")
+        text.place(x=0, y=0)
+
     except Exception as e:
-        showError_Success.configure(
-            text="An error occurred: " + str(e), text_color="red"
-        )
+        # show message
+        text.configure(text="An error occurred !", text_color="white", bg_color="red")
+        text.place(x=0, y=0)
         print(e)
 
         pPercentage.pack(padx=5, pady=5)
@@ -159,7 +190,6 @@ def download_thread():
 
 def startDownload():
     # Create a new thread for the download process
-    download_thread_obj = threading.Thread(target=download_thread)
     download_thread_obj.start()
 
     # Update GUI elements (if needed)
@@ -169,7 +199,7 @@ def startDownload():
 
 def clearEntry():
     url_var.set("")
-    showError_Success.configure(text="")
+    text.place_forget()
 
     # Hide the download button and the progress bar
     button_download.pack_forget()
@@ -189,11 +219,12 @@ def clearEntry():
 
     details_frame.pack_forget()
 
-    details_frame.pack(pady=10)
-    details_frame.configure(width=width)
+    # details_frame.pack(pady=10)
+    # details_frame.configure(width=width)
 
 
 def displayImage_and_details():
+    details_frame.pack(pady=10)
     # Display thumbnail image
     imageUrl = YT_OBJECT.thumbnail_url
     u = urlopen(imageUrl)
@@ -244,7 +275,7 @@ app.title("YouTube Downloader")
 
 # Create a Frame to contain the buttons
 textEntry_frame = customtkinter.CTkFrame(app)
-textEntry_frame.pack(pady=(80,10))  # Adjust pady as needed
+textEntry_frame.pack(pady=(80, 10))  # Adjust pady as needed
 
 # link
 url_var = tk.StringVar()
@@ -312,6 +343,10 @@ text = customtkinter.CTkLabel(
     app, text="searching", text_color="black", width=720, bg_color="yellow"
 )
 
+
+# initialise threads
+download_thread_obj = threading.Thread(target=download_thread)
+search_thread = threading.Thread(target=searchVideo)
 
 # run app
 def startMain():
