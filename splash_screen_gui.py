@@ -1,7 +1,7 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import time
-
+import os
 w = Tk()
 
 # Using piece of code from old splash screen
@@ -39,8 +39,8 @@ developed_by_label.configure(font=("Calibri", 10, "bold"))
 developed_by_label.place(x=75, y=200)
 
 # making animation
-image_a = ImageTk.PhotoImage(Image.open("c2.png"))
-image_b = ImageTk.PhotoImage(Image.open("c1.png"))
+image_a = ImageTk.PhotoImage(file=os.path.join("assets", "c1.png"))
+image_b = ImageTk.PhotoImage(file=os.path.join("assets", "c2.png"))
 
 
 def animate():

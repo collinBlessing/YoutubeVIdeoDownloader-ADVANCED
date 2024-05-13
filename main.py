@@ -8,7 +8,7 @@ from pytube import YouTube
 import threading
 from tkinter import messagebox
 from CTkMenuBar import *
-
+from menu_spawn import *
 import os
 import io
 
@@ -39,7 +39,7 @@ def on_progress(stream, chunk, bytes_remaining):
 
 def showSearchingText():
     text.configure(text="searching", text_color="black", bg_color="yellow")
-    text.place(x=0, y=0)
+    text.place(x=0, y=30)
     # Create a new thread for the download process
     if search_thread.is_alive():
         userResponse = messagebox.askyesno(
@@ -97,8 +97,6 @@ def searchVideo():
 
             my_option.pack(side="left", padx=5, pady=5)
 
-            # show details here
-
             # hide searching
             text.place_forget()
 
@@ -112,19 +110,19 @@ def searchVideo():
             text.configure(
                 text="Invalid YouTube link!", text_color="white", bg_color="red"
             )
-            text.place(x=0, y=0)
+            text.place(x=0, y=30)
 
         except pytube.exceptions.VideoUnavailable:
             text.configure(
                 text="Video is unavailable!", text_color="white", bg_color="red"
             )
-            text.place(x=0, y=0)
+            text.place(x=0, y=30)
 
         except Exception as e:
             text.configure(
                 text="An error occurred: " + str(e), text_color="white", bg_color="red"
             )
-            text.place(x=0, y=0)
+            text.place(x=0, y=30)
 
             # display error for a poor connection
     except (requests.ConnectionError, requests.Timeout) as exception:
@@ -132,7 +130,7 @@ def searchVideo():
         text.configure(
             text="No internet connection!", text_color="white", bg_color="red"
         )
-        text.place(x=0, y=0)
+        text.place(x=0, y=30)
         return
 
 
@@ -147,7 +145,7 @@ def download_thread():
                 text.configure(
                     text="Downloading ....", text_color="green", bg_color="white"
                 )
-                text.place(x=0, y=0)
+                text.place(x=0, y=30)
                 output_file = audio_stream.download(output_path=SAVE_PATH)
                 base, ext = os.path.splitext(output_file)
                 new_file = base + ".mp3"
@@ -157,7 +155,7 @@ def download_thread():
                 text.configure(
                     text="Audio download Complete", text_color="white", bg_color="green"
                 )
-                text.place(x=0, y=0)
+                text.place(x=0, y=30)
 
 
 
@@ -170,7 +168,7 @@ def download_thread():
                 text.configure(
                     text="No audio stream found!", text_color="white", bg_color="red"
                 )
-                text.place(x=0, y=0)
+                text.place(x=0, y=30)
                 return
 
         elif my_option.get() == "mp4":
@@ -178,14 +176,14 @@ def download_thread():
             text.configure(
                 text="Downloading ....", text_color="green", bg_color="white"
             )
-            text.place(x=0, y=0)
+            text.place(x=0, y=30)
 
             VIDEO_FOUND.download(SAVE_PATH)
             # show message
             text.configure(
                 text="Video download Complete", text_color="white", bg_color="green"
             )
-            text.place(x=0, y=0)
+            text.place(x=0, y=30)
 
             # remove progress bar
             pPercentage.pack_forget()
@@ -195,17 +193,17 @@ def download_thread():
     except pytube.exceptions.VideoUnavailable:
         # show message
         text.configure(text="Video is unavailable!", text_color="white", bg_color="red")
-        text.place(x=0, y=0)
+        text.place(x=0, y=30)
     except pytube.exceptions.RegexMatchError:
 
         # show message
         text.configure(text="Invalid Youtube link", text_color="white", bg_color="red")
-        text.place(x=0, y=0)
+        text.place(x=0, y=30)
 
     except Exception as e:
         # show message
         text.configure(text="An error occurred !", text_color="white", bg_color="red")
-        text.place(x=0, y=0)
+        text.place(x=0, y=30)
         print(e)
 
         pPercentage.pack(padx=5, pady=5)
@@ -251,8 +249,6 @@ def clearEntry():
 
     details_frame.pack_forget()
 
-    # details_frame.pack(pady=10)
-    # details_frame.configure(width=width)
 
 
 def displayImage_and_details():
@@ -287,6 +283,10 @@ def displayImage_and_details():
         side="right", padx=5, pady=(20, 10)
     )  # Display title on the right side with padding
 
+# menu commands
+
+def test():
+    Preferences()
 
 def Menu():
     menu = CTkMenuBar(app)
@@ -301,17 +301,13 @@ def Menu():
 
     dropdown1.add_separator()
 
-    sub_menu = dropdown1.add_submenu("Export As")
-    sub_menu.add_option(option=".TXT")
-    sub_menu.add_option(option=".PDF")
-
     dropdown2 = CustomDropdownMenu(widget=button_2)
     dropdown2.add_option(option="Cut")
     dropdown2.add_option(option="Copy")
     dropdown2.add_option(option="Paste")
 
     dropdown3 = CustomDropdownMenu(widget=button_3)
-    dropdown3.add_option(option="Preferences")
+    dropdown3.add_option(option="Preferences", command=test)
     dropdown3.add_option(option="Update")
 
     dropdown4 = CustomDropdownMenu(widget=button_4)
@@ -328,10 +324,16 @@ customtkinter.set_default_color_theme("blue")
 app = customtkinter.CTk()
 app.geometry("720x480")
 app.resizable(0, 0)
-app.title("YouTube Downloader")
+app.title("Tube Fetch")
+
+
+iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.ico"))
+app.after(
+    300, lambda: app.iconphoto(False, iconpath)
+)
 
 Menu()
-# app.iconbitmap("images/logo.ico")
+
 
 # Adding ui elements
 
