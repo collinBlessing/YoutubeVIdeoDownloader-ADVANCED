@@ -10,6 +10,7 @@ import threading
 import os
 import io
 
+
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
@@ -33,7 +34,12 @@ def on_progress(stream, chunk, bytes_remaining):
         progressBar.set(float(percentage_downloaded / 100))
 
 
-# noinspection PyUnusedLocal
+def showSearchingText():
+    text.place(x=0, y=0)
+    searching_text.pack(padx=5, pady=5)
+    search_thread = threading.Thread(target=searchVideo)
+    search_thread.start()
+
 # method to search for video existence on youtube
 def searchVideo():
     # Hide the download button and the progress bar
@@ -42,7 +48,6 @@ def searchVideo():
 
     # Clear the error message
     # url_var.set("")
-    showError_Success.configure(text="")
 
     # Clear the progress bar
     progressBar.pack_forget()
@@ -77,11 +82,9 @@ def searchVideo():
         requests.get("http://google.com", timeout=5)
 
         # If the request succeeds, continue with youtube search
-        showError_Success.configure(text="Searching .....", text_color="yellow")
 
         global YT_OBJECT, VIDEO_FOUND
         try:
-            showError_Success.configure(text="")
             yt_link = link.get()
             YT_OBJECT = YouTube(yt_link, on_progress_callback=on_progress)
             VIDEO_FOUND = YT_OBJECT.streams.get_highest_resolution()
@@ -91,14 +94,11 @@ def searchVideo():
             # display download button
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
-
-            # # Clear the error message
-            # url_var.set("")
-            # showError_Success.configure(text="")
-            # showError_Success.pack()
-
-
             # show details here
+
+            # hide searching
+            searching_text.pack_forget()
+
             displayImage_and_details()
 
         except pytube.exceptions.RegexMatchError:
@@ -129,7 +129,7 @@ def download_thread():
             if audio_stream:
                 output_file = audio_stream.download(output_path=SAVE_PATH)
                 base, ext = os.path.splitext(output_file)
-                new_file = base+ '.mp3'
+                new_file = base + ".mp3"
                 os.rename(output_file, new_file)
                 showError_Success.configure(
                     text="Audio download Complete", text_color="green"
@@ -140,7 +140,9 @@ def download_thread():
                 )
         elif my_option.get() == "mp4":
             VIDEO_FOUND.download(SAVE_PATH)
-            showError_Success.configure(text="Video download Complete", text_color="green")
+            showError_Success.configure(
+                text="Video download Complete", text_color="green"
+            )
     except pytube.exceptions.VideoUnavailable:
         showError_Success.configure(text="Video is unavailable!", text_color="red")
     except pytube.exceptions.RegexMatchError:
@@ -150,7 +152,7 @@ def download_thread():
             text="An error occurred: " + str(e), text_color="red"
         )
         print(e)
-            
+
         pPercentage.pack(padx=5, pady=5)
         progressBar.pack(padx=5, pady=5)
 
@@ -216,8 +218,7 @@ def displayImage_and_details():
     video_title.configure(text=YT_OBJECT.title)
     # Display video title
     video_title.configure(
-        text=YT_OBJECT.title, font=("Helvetica", 18, "bold"),
-        wraplength=200
+        text=YT_OBJECT.title, font=("Helvetica", 18, "bold"), wraplength=200
     )  # Increase font size
     video_title.pack(
         side="right", padx=5, pady=(20, 10)
@@ -233,16 +234,17 @@ customtkinter.set_default_color_theme("blue")
 # app frame
 app = customtkinter.CTk()
 app.geometry("720x480")
+app.resizable(0, 0)
 app.title("YouTube Downloader")
 # app.iconbitmap("images/logo.ico")
 
 # Adding ui elements
-title = customtkinter.CTkLabel(app, text="Enter youtube link")
-title.pack(padx=5, pady=5)
+# title = customtkinter.CTkLabel(app, text="Enter youtube link")
+# title.pack(padx=5, pady=25)
 
 # Create a Frame to contain the buttons
 textEntry_frame = customtkinter.CTkFrame(app)
-textEntry_frame.pack(pady=10)  # Adjust pady as needed
+textEntry_frame.pack(pady=(80,10))  # Adjust pady as needed
 
 # link
 url_var = tk.StringVar()
@@ -257,7 +259,7 @@ clearButton = customtkinter.CTkButton(
 
 # First Download Button
 searchButton = customtkinter.CTkButton(
-    textEntry_frame, height=40, text="search", command=searchVideo
+    textEntry_frame, height=40, text="search", command=showSearchingText
 )
 
 # Create a Frame to contain the buttons
@@ -290,16 +292,25 @@ progressBar.set(0)
 
 # Adjust the width of the details frame based on the width of other widgets
 width = (
-    link.winfo_reqwidth() + clearButton.winfo_reqwidth() + searchButton.winfo_reqwidth() + 20
+    link.winfo_reqwidth()
+    + clearButton.winfo_reqwidth()
+    + searchButton.winfo_reqwidth()
+    + 20
 )
 
 # details frame
-details_frame = customtkinter.CTkFrame(app)
-details_frame.pack(pady=10)
-details_frame.configure(width=width)
+details_frame = customtkinter.CTkFrame(app, width=width)
 
 # image frame
 video_title = customtkinter.CTkLabel(details_frame, text="")
+
+
+searching_text = customtkinter.CTkLabel(
+    app, text="Searching......", text_color="yellow"
+)
+text = customtkinter.CTkLabel(
+    app, text="searching", text_color="black", width=720, bg_color="yellow"
+)
 
 
 # run app
@@ -308,6 +319,3 @@ def startMain():
     clearButton.pack(side="left", padx=5)
     searchButton.pack(side="left", padx=5)
     app.mainloop()
-
-
-
