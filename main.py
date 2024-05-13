@@ -6,6 +6,7 @@ import pytube
 import requests
 from pytube import YouTube
 import threading
+from tkinter import messagebox
 
 import os
 import io
@@ -190,7 +191,15 @@ def download_thread():
 
 def startDownload():
     # Create a new thread for the download process
-    download_thread_obj.start()
+    if download_thread_obj.is_alive():
+        userResponse = messagebox.askyesno(
+            "Warning",
+            "A download is still in progress, are you sure you want to cancel",
+        )
+        if userResponse:
+            download_thread_obj.start()
+    else:
+        download_thread_obj.start()
 
     # Update GUI elements (if needed)
     pPercentage.pack(padx=5, pady=5)
@@ -347,6 +356,7 @@ text = customtkinter.CTkLabel(
 # initialise threads
 download_thread_obj = threading.Thread(target=download_thread)
 search_thread = threading.Thread(target=searchVideo)
+
 
 # run app
 def startMain():
