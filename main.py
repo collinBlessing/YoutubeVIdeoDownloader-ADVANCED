@@ -7,6 +7,7 @@ import requests
 from pytube import YouTube
 import threading
 from tkinter import messagebox
+from CTkMenuBar import *
 
 import os
 import io
@@ -39,7 +40,16 @@ def on_progress(stream, chunk, bytes_remaining):
 def showSearchingText():
     text.configure(text="searching", text_color="black", bg_color="yellow")
     text.place(x=0, y=0)
-    search_thread.start()
+    # Create a new thread for the download process
+    if search_thread.is_alive():
+        userResponse = messagebox.askyesno(
+            "Warning",
+            "A search is still in progress, are you sure you want to cancel",
+        )
+        if userResponse:
+            search_thread.start()
+    else:
+        search_thread.start()
 
 
 # method to search for video existence on youtube
@@ -148,12 +158,20 @@ def download_thread():
                     text="Audio download Complete", text_color="white", bg_color="green"
                 )
                 text.place(x=0, y=0)
+
+
+
+                # remove progress bar
+                pPercentage.pack_forget()
+                progressBar.pack_forget()
+                return
             else:
                 # show message
                 text.configure(
                     text="No audio stream found!", text_color="white", bg_color="red"
                 )
                 text.place(x=0, y=0)
+                return
 
         elif my_option.get() == "mp4":
 
@@ -168,6 +186,11 @@ def download_thread():
                 text="Video download Complete", text_color="white", bg_color="green"
             )
             text.place(x=0, y=0)
+
+            # remove progress bar
+            pPercentage.pack_forget()
+            progressBar.pack_forget()
+            return
 
     except pytube.exceptions.VideoUnavailable:
         # show message
@@ -265,6 +288,36 @@ def displayImage_and_details():
     )  # Display title on the right side with padding
 
 
+def Menu():
+    menu = CTkMenuBar(app)
+    button_1 = menu.add_cascade("File")
+    button_2 = menu.add_cascade("Edit")
+    button_3 = menu.add_cascade("Settings")
+    button_4 = menu.add_cascade("About")
+
+    dropdown1 = CustomDropdownMenu(widget=button_1)
+    dropdown1.add_option(option="Open", command=lambda: print("Open"))
+    dropdown1.add_option(option="Save")
+
+    dropdown1.add_separator()
+
+    sub_menu = dropdown1.add_submenu("Export As")
+    sub_menu.add_option(option=".TXT")
+    sub_menu.add_option(option=".PDF")
+
+    dropdown2 = CustomDropdownMenu(widget=button_2)
+    dropdown2.add_option(option="Cut")
+    dropdown2.add_option(option="Copy")
+    dropdown2.add_option(option="Paste")
+
+    dropdown3 = CustomDropdownMenu(widget=button_3)
+    dropdown3.add_option(option="Preferences")
+    dropdown3.add_option(option="Update")
+
+    dropdown4 = CustomDropdownMenu(widget=button_4)
+    dropdown4.add_option(option="Hello World")
+
+
 # initialise elements
 
 # system settings
@@ -276,13 +329,14 @@ app = customtkinter.CTk()
 app.geometry("720x480")
 app.resizable(0, 0)
 app.title("YouTube Downloader")
+
+Menu()
 # app.iconbitmap("images/logo.ico")
 
 # Adding ui elements
-# title = customtkinter.CTkLabel(app, text="Enter youtube link")
-# title.pack(padx=5, pady=25)
 
 # Create a Frame to contain the buttons
+
 textEntry_frame = customtkinter.CTkFrame(app)
 textEntry_frame.pack(pady=(80, 10))  # Adjust pady as needed
 
@@ -356,7 +410,6 @@ text = customtkinter.CTkLabel(
 # initialise threads
 download_thread_obj = threading.Thread(target=download_thread)
 search_thread = threading.Thread(target=searchVideo)
-
 
 # run app
 def startMain():

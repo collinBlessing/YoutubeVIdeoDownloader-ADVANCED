@@ -20,6 +20,7 @@ w.overrideredirect(1)  # for hiding titlebar
 # new window to open
 def callMainWindow():
     import main
+
     main.startMain()
 
 
