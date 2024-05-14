@@ -25,10 +25,17 @@ exc = conn.cursor()
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
-THEME =  exc.execute("SELECT current_theme from theme").fetchone()[0]
+THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
+
+import sys
+
+
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 
 # noinspection PyUnresolvedReferences
@@ -200,20 +207,17 @@ def download_thread():
 
     except pytube.exceptions.VideoUnavailable:
         # show message
-        text.configure(text="Video is unavailable!",
-                       text_color="white", bg_color="red")
+        text.configure(text="Video is unavailable!", text_color="white", bg_color="red")
         text.place(x=0, y=30)
     except pytube.exceptions.RegexMatchError:
 
         # show message
-        text.configure(text="Invalid Youtube link",
-                       text_color="white", bg_color="red")
+        text.configure(text="Invalid Youtube link", text_color="white", bg_color="red")
         text.place(x=0, y=30)
 
     except Exception as e:
         # show message
-        text.configure(text="An error occurred !",
-                       text_color="white", bg_color="red")
+        text.configure(text="An error occurred !", text_color="white", bg_color="red")
         text.place(x=0, y=30)
         print(e)
 
@@ -296,6 +300,7 @@ def displayImage_and_details():
 
 # menu commands
 
+
 def opendownloadsFolder():
     system = platform.system()
     if system == "Windows":
@@ -303,10 +308,10 @@ def opendownloadsFolder():
         subprocess.Popen(f'explorer /select, "{SAVE_PATH}"')
     elif system == "Darwin":  # macOS
         # macOS typically opens the Downloads folder with this command
-        subprocess.Popen(['open', SAVE_PATH])
+        subprocess.Popen(["open", SAVE_PATH])
     elif system == "Linux":
         # Linux typically opens the Downloads folder with this command
-        subprocess.Popen(['xdg-open', SAVE_PATH])
+        subprocess.Popen(["xdg-open", SAVE_PATH])
     else:
         print("Unsupported operating system.")
 
@@ -331,7 +336,8 @@ def Menu():
 
     dropdown1 = CustomDropdownMenu(widget=button_1)
     dropdown1.add_option(option="Open downloads", command=opendownloadsFolder)
-    dropdown1.add_option(option="Quit", command=closeProgram)
+    # dropdown1.add_option(option="Quit", command=closeProgram)
+    dropdown1.add_option(option="Quit", command=restart_program)
 
     dropdown1.add_separator()
 
