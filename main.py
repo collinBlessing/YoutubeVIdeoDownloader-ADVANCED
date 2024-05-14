@@ -285,7 +285,7 @@ def displayImage_and_details():
 
 # menu commands
 
-def test():
+def preferences():
     Preferences()
 
 def Menu():
@@ -293,7 +293,7 @@ def Menu():
     button_1 = menu.add_cascade("File")
     button_2 = menu.add_cascade("Edit")
     button_3 = menu.add_cascade("Settings")
-    button_4 = menu.add_cascade("About")
+    button_4 = menu.add_cascade("Help")
 
     dropdown1 = CustomDropdownMenu(widget=button_1)
     dropdown1.add_option(option="Open", command=lambda: print("Open"))
@@ -307,11 +307,12 @@ def Menu():
     dropdown2.add_option(option="Paste")
 
     dropdown3 = CustomDropdownMenu(widget=button_3)
-    dropdown3.add_option(option="Preferences", command=test)
+    dropdown3.add_option(option="Preferences", command=lambda : Preferences())
     dropdown3.add_option(option="Update")
 
     dropdown4 = CustomDropdownMenu(widget=button_4)
-    dropdown4.add_option(option="Hello World")
+    dropdown4.add_option(option="Check updates")
+    dropdown4.add_option(option="About", command=lambda : About())
 
 
 # initialise elements
@@ -327,7 +328,7 @@ app.resizable(0, 0)
 app.title("Tube Fetch")
 
 
-iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.ico"))
+iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
 app.after(
     300, lambda: app.iconphoto(False, iconpath)
 )

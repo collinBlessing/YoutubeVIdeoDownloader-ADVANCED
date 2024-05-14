@@ -7,7 +7,7 @@ def Preferences():
     preferences_window = ctk.CTk()
     preferences_window.geometry("420x320")
     preferences_window.title("Preferences")
-    iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.ico"))
+    iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
     preferences_window.after(300, lambda: preferences_window.iconphoto(False, iconpath))
     preferences_window.resizable(0, 0)
 
@@ -27,8 +27,8 @@ def Preferences():
 def About():
     about_window = ctk.CTk()
     about_window.geometry("420x320")
-    about_window.title("About ")
-    iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.ico"))
+    about_window.title("About")
+    iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
     about_window.after(300, lambda: about_window.iconphoto(False, iconpath))
     about_window.resizable(0, 0)
 
@@ -43,5 +43,4 @@ def About():
     about_window.mainloop()
 
 
-# Test the Preferences function
 About()
