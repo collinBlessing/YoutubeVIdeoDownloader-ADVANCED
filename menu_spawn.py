@@ -5,6 +5,10 @@ from tkinter.filedialog import askdirectory
 import webbrowser
 
 
+CURRENT_THEME = 'red'
+NEW_THEME = ''
+
+
 def Preferences():
     def chooseSelection():
         new_path = '{}'.format(askdirectory(
@@ -12,28 +16,68 @@ def Preferences():
         print(new_path)
 
     preferences_window = ctk.CTk()
-    preferences_window.geometry("420x320")
+    preferences_window.geometry("600x320")
     preferences_window.title("Preferences")
     iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
     preferences_window.after(
         300, lambda: preferences_window.iconphoto(False, iconpath))
     preferences_window.resizable(0, 0)
 
+
+
+    # unsaved changes
+    text = ctk.CTkLabel(
+        preferences_window, text="unsaved changes", text_color="black", width=600, bg_color="yellow"
+    )
+    text.place(x=0, y=0)
+
+
+
+    downloadFolder = ctk.CTkFrame(preferences_window)
     # Labels
     download_folder_label = ctk.CTkLabel(
-        preferences_window, text="Download Folder:")
-    download_folder_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        downloadFolder, text="Download Folder:")
+    download_folder_label.pack(side='left', padx=10, pady=10)
     # Labels
     download_folder_location = ctk.CTkLabel(
-        preferences_window, text="/home/collyne/downloads", wraplength=150, text_color="yellow")
+        downloadFolder, text="/home/collyne/downloads", wraplength=150, text_color="green")
 
-    download_folder_location.grid(
-        row=0, column=1, padx=45, pady=10, sticky="w")
+    download_folder_location.pack(side='left', padx=10, pady=10)
 
     # Button
     download_folder_Button = ctk.CTkButton(
-        preferences_window, text="...", width=10, command=chooseSelection)
-    download_folder_Button.grid(row=0, column=2, padx=20, pady=10, sticky="w")
+        downloadFolder, text="change",  command=chooseSelection)
+    download_folder_Button.pack(side='left', padx=10, pady=10)
+
+    downloadFolder.pack(padx=10, pady=(50,10))
+
+    # theme text
+    themeFrame = ctk.CTkFrame(preferences_window)
+    themeText = ctk.CTkLabel(
+        themeFrame, text="Choose Theme", wraplength=150)
+
+    themeText.pack(side = "left", padx=(10, 60), pady=10)
+
+    # options
+
+    themes = ['carrot', 'coffee', 'marsh', 'metal',
+              'pink', 'red', 'rose', 'sky', 'violet', 'yellow']
+    themeOptions = ctk.CTkOptionMenu(
+        themeFrame, values=themes)
+    themeOptions.set(CURRENT_THEME)
+
+    themeOptions.pack(side="left", padx=10, pady=10)
+    themeFrame.pack(padx=10, pady=10)
+
+    # Automatically download files
+    automatic_download = ctk.CTkCheckBox(
+        preferences_window, text='start downloading files automatically')
+    automatic_download.pack(padx=(10, 60), pady=10)
+
+
+    # save button
+    saveButton = ctk.CTkButton(preferences_window, text='Save')
+    saveButton.pack(padx=10, pady=10)
 
     preferences_window.mainloop()
 
@@ -59,10 +103,10 @@ def About():
 
     link_text = "http://www.nahuriracollinblessing.com"
     button_link = ctk.CTkButton(
-        about_window, text='Visit portfolio', command=visitPortfolio)
+        about_window, height=5, text='Visit portfolio', command=visitPortfolio)
     button_link.pack(padx=10, pady=10)
 
     about_window.mainloop()
 
 
-# About()
+Preferences()

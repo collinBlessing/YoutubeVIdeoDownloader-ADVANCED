@@ -1,20 +1,19 @@
+import io
+import os
 import platform
 import subprocess
-import webbrowser
+import threading
 import tkinter as tk
-from PIL import Image, ImageTk
+from tkinter import messagebox
 from urllib.request import urlopen
+
 import customtkinter
 import pytube
 import requests
-from pytube import YouTube
-import threading
-from tkinter import messagebox
 from CTkMenuBar import *
-from menu_spawn import *
-import os
-import io
+from pytube import YouTube
 
+from menu_spawn import *
 
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
@@ -56,7 +55,7 @@ def showSearchingText():
         search_thread.start()
 
 
-# method to search for video existence on youtube
+# method to search for video existence on YouTube
 def searchVideo():
     # Hide the download button and the progress bar
     button_download.pack_forget()
@@ -89,9 +88,9 @@ def searchVideo():
 
     try:
         # Send a request to google.com to check for an internet connection
-        requests.get("http://google.com", timeout=5)
+        requests.get("https://google.com", timeout=5)
 
-        # If the request succeeds, continue with youtube search
+        # If the request succeeds, continue with YouTube search
 
         global YT_OBJECT, VIDEO_FOUND
         try:
