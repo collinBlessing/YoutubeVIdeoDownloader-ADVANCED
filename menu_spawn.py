@@ -12,12 +12,50 @@ exc = conn.cursor()
 
 def Preferences():
     def saveChanges():
-        CURRENT_THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
 
+        # save theme
+        CURRENT_THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
         NEW_THEME = themeOptions.get()
 
-        if NEW_THEME != CURRENT_THEME:
-            exc.execute("UPDATE theme SET current_theme = ? WHERE ID = 1", (NEW_THEME,))
+        CURRENT_SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
+        NEW_SAVE_PATH = download_folder_location.cget("text")
+
+        # set state from the check
+        CURRENT_AUTO_SAVE_STATE = exc.execute(
+            "SELECT auto_download from path"
+        ).fetchone()[0]
+
+        # set state from the check
+        if automatic_download.get():
+            NEW_AUTO_SAVE_STATE = "true"
+        else:
+            NEW_AUTO_SAVE_STATE = "false"
+
+        print(CURRENT_AUTO_SAVE_STATE)
+        print(NEW_AUTO_SAVE_STATE)
+
+        if (
+            NEW_THEME != CURRENT_THEME
+            or CURRENT_SAVE_PATH != NEW_SAVE_PATH
+            or CURRENT_AUTO_SAVE_STATE != NEW_AUTO_SAVE_STATE
+        ):
+
+            if NEW_THEME != CURRENT_THEME:
+                exc.execute(
+                    "UPDATE theme SET current_theme = ? WHERE ID = 1", (NEW_THEME,)
+                )
+
+            if CURRENT_SAVE_PATH != NEW_SAVE_PATH:
+                exc.execute(
+                    "UPDATE path SET download_path = ? WHERE ID = 1", (NEW_SAVE_PATH,)
+                )
+
+            if CURRENT_AUTO_SAVE_STATE != NEW_AUTO_SAVE_STATE:
+                exc.execute(
+                    "UPDATE path SET auto_download = ? WHERE ID = 1",
+                    (NEW_AUTO_SAVE_STATE,),
+                )
+
             conn.commit()
 
             text.configure(
@@ -30,9 +68,11 @@ def Preferences():
             )
             text.place(x=0, y=0)
 
+        #
+
     def chooseSelection():
         new_path = "{}".format(askdirectory(title="Choose directrory", mustexist=True))
-        print(new_path)
+        download_folder_location.configure(text=new_path)
 
     preferences_window = ctk.CTk()
     preferences_window.geometry("600x320")
@@ -77,11 +117,12 @@ def Preferences():
 
     themeText.pack(side="left", padx=(10, 60), pady=10)
 
-    # TODO: fix error on about page
+    # TODO: fix error on about page on the icon
     # options
 
     themes = ["marsh", "metal", "pink", "red", "violet", "yellow"]
     themeOptions = ctk.CTkOptionMenu(themeFrame, values=themes)
+
     CURRENT_THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
     themeOptions.set(CURRENT_THEME)
 
