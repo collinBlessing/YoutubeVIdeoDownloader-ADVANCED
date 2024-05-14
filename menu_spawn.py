@@ -3,9 +3,10 @@ from PIL import Image, ImageTk
 import os
 from tkinter.filedialog import askdirectory
 import webbrowser
+import tkinter as tk
 import sqlite3 as sq
 from utils import restart_program
-
+from tkinter import messagebox
 conn = sq.connect("info.db")
 exc = conn.cursor()
 
@@ -57,8 +58,6 @@ def Preferences():
                     (NEW_AUTO_SAVE_STATE,),
                 )
 
-
-
             conn.commit()
 
             text.configure(
@@ -66,8 +65,24 @@ def Preferences():
             )
             text.place(x=0, y=0)
 
-            if theme_changed:
+        if theme_changed:
+            theme_changed = False
+            # Create a temporary Toplevel window to be able to use lift()
+            top = tk.Toplevel()
+            top.lift()
+            top.attributes("-topmost", True)  # Make the topmost window
+            top.withdraw()  # Hide the top window
+
+            user_response = messagebox.askyesno(
+                "Restart Required",
+                "The theme has been updated, but the changes won't take effect until the program is restarted. Would you like to restart now?",parent=top
+            )
+            top.destroy()
+            if user_response:
                 restart_program()
+            else:
+                preferences_window.lift()
+
         else:
             text.configure(
                 text="No changes to make", bg_color="yellow", text_color="black"
@@ -80,12 +95,14 @@ def Preferences():
         new_path = "{}".format(askdirectory(title="Choose directrory", mustexist=True))
         download_folder_location.configure(text=new_path)
 
-    preferences_window = ctk.CTk()
+
+    preferences_window = ctk.CTkToplevel()
     preferences_window.geometry("600x320")
     preferences_window.title("Preferences")
     iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
     preferences_window.after(300, lambda: preferences_window.iconphoto(False, iconpath))
     preferences_window.resizable(0, 0)
+    # preferences_window.protocol("WM_DELETE_WINDOW", close_main_window)
 
     # unsaved changes
     text = ctk.CTkLabel(
@@ -149,7 +166,7 @@ def Preferences():
 
 
 def About():
-    about_window = ctk.CTk()
+    about_window = ctk.CTkToplevel()
     about_window.geometry("420x320")
     about_window.title("About")
     iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
@@ -174,6 +191,3 @@ def About():
     button_link.pack(padx=10, pady=10)
 
     about_window.mainloop()
-
-
-Preferences()

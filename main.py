@@ -332,8 +332,8 @@ def Menu():
 
     dropdown1 = CustomDropdownMenu(widget=button_1)
     dropdown1.add_option(option="Open downloads", command=opendownloadsFolder)
-    # dropdown1.add_option(option="Quit", command=closeProgram)
-    dropdown1.add_option(option="Quit", command=restart_program)
+    dropdown1.add_option(option="Restart", command=restart_program)
+    dropdown1.add_option(option="Quit", command=closeProgram)
 
     dropdown1.add_separator()
 
