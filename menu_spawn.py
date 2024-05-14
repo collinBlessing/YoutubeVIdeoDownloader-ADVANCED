@@ -58,10 +58,11 @@ def Preferences():
 
     themeText.pack(side = "left", padx=(10, 60), pady=10)
 
+# TODO: fix error on about page
     # options
 
-    themes = ['carrot', 'coffee', 'marsh', 'metal',
-              'pink', 'red', 'rose', 'sky', 'violet', 'yellow']
+    themes = ['marsh', 'metal',
+              'pink', 'red', 'violet', 'yellow']
     themeOptions = ctk.CTkOptionMenu(
         themeFrame, values=themes)
     themeOptions.set(CURRENT_THEME)
@@ -109,4 +110,4 @@ def About():
     about_window.mainloop()
 
 
-Preferences()
+# Preferences()

@@ -24,6 +24,7 @@ def callMainWindow():
     main.startMain()
 
 
+
 frame = Frame(w, width=427, height=250, bg="#000")
 frame.place(x=0, y=0)
 label1 = Label(w, text="Tube Fetch", fg="white", bg="#000")  # decorate it

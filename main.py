@@ -15,10 +15,17 @@ from pytube import YouTube
 
 from menu_spawn import *
 
+
+import sqlite3 as sq
+
+# conn = sq.connect(':memory:')
+conn = sq.connect("info.db")
+exc = conn.cursor()
+
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
-THEME = "red"
+THEME =  exc.execute("SELECT current_theme from theme").fetchone()[0]
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
@@ -330,10 +337,9 @@ def Menu():
 
     dropdown3 = CustomDropdownMenu(widget=button_3)
     dropdown3.add_option(option="Preferences", command=lambda: Preferences())
-    dropdown3.add_option(option="Update")
 
     dropdown4 = CustomDropdownMenu(widget=button_4)
-    dropdown4.add_option(option="Check updates")
+    dropdown4.add_option(option="Check for updates")
     dropdown4.add_option(option="About", command=lambda: About())
 
 
