@@ -44,7 +44,7 @@ image_b = ImageTk.PhotoImage(file=os.path.join("assets", "c2.png"))
 
 
 def animate():
-    for i in range(2):  # 5 loops
+    for i in range(1):  # 5 loops
         l1 = Label(w, image=image_a, border=0, relief=SUNKEN)
         l1.place(x=180, y=145)
         l2 = Label(w, image=image_b, border=0, relief=SUNKEN)
@@ -94,6 +94,6 @@ def animate():
 
 
 # Schedule the animation to run before opening the main window
-w.after(2000, animate)  # Wait 2 seconds before starting the animation
+w.after(1000, animate)  # Wait 2 seconds before starting the animation
 
 w.mainloop()

@@ -1,3 +1,4 @@
+import webbrowser
 import tkinter as tk
 from PIL import Image, ImageTk
 from urllib.request import urlopen
@@ -16,6 +17,7 @@ import io
 SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
+THEME = "red"
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
@@ -157,8 +159,6 @@ def download_thread():
                 )
                 text.place(x=0, y=30)
 
-
-
                 # remove progress bar
                 pPercentage.pack_forget()
                 progressBar.pack_forget()
@@ -192,17 +192,20 @@ def download_thread():
 
     except pytube.exceptions.VideoUnavailable:
         # show message
-        text.configure(text="Video is unavailable!", text_color="white", bg_color="red")
+        text.configure(text="Video is unavailable!",
+                       text_color="white", bg_color="red")
         text.place(x=0, y=30)
     except pytube.exceptions.RegexMatchError:
 
         # show message
-        text.configure(text="Invalid Youtube link", text_color="white", bg_color="red")
+        text.configure(text="Invalid Youtube link",
+                       text_color="white", bg_color="red")
         text.place(x=0, y=30)
 
     except Exception as e:
         # show message
-        text.configure(text="An error occurred !", text_color="white", bg_color="red")
+        text.configure(text="An error occurred !",
+                       text_color="white", bg_color="red")
         text.place(x=0, y=30)
         print(e)
 
@@ -250,7 +253,6 @@ def clearEntry():
     details_frame.pack_forget()
 
 
-
 def displayImage_and_details():
     details_frame.pack(pady=10)
     # Display thumbnail image
@@ -283,43 +285,52 @@ def displayImage_and_details():
         side="right", padx=5, pady=(20, 10)
     )  # Display title on the right side with padding
 
+
 # menu commands
 
-def preferences():
-    Preferences()
+
+def opendownloadsFolder():
+    webbrowser.open(SAVE_PATH)
+
+
+def closeProgram():
+    if search_thread.is_alive() or download_thread_obj.is_alive():
+        userResponse = messagebox.askyesno(
+            "Warning",
+            "Tube fetch is currently running some processes, are you sure you want to cancel",
+        )
+        if userResponse:
+            exit()
+    else:
+        exit()
+
 
 def Menu():
     menu = CTkMenuBar(app)
     button_1 = menu.add_cascade("File")
-    button_2 = menu.add_cascade("Edit")
     button_3 = menu.add_cascade("Settings")
     button_4 = menu.add_cascade("Help")
 
     dropdown1 = CustomDropdownMenu(widget=button_1)
-    dropdown1.add_option(option="Open", command=lambda: print("Open"))
-    dropdown1.add_option(option="Save")
+    dropdown1.add_option(option="Open downloads", command=opendownloadsFolder)
+    dropdown1.add_option(option="Quit", command=closeProgram)
 
     dropdown1.add_separator()
 
-    dropdown2 = CustomDropdownMenu(widget=button_2)
-    dropdown2.add_option(option="Cut")
-    dropdown2.add_option(option="Copy")
-    dropdown2.add_option(option="Paste")
-
     dropdown3 = CustomDropdownMenu(widget=button_3)
-    dropdown3.add_option(option="Preferences", command=lambda : Preferences())
+    dropdown3.add_option(option="Preferences", command=lambda: Preferences())
     dropdown3.add_option(option="Update")
 
     dropdown4 = CustomDropdownMenu(widget=button_4)
     dropdown4.add_option(option="Check updates")
-    dropdown4.add_option(option="About", command=lambda : About())
+    dropdown4.add_option(option="About", command=lambda: About())
 
 
 # initialise elements
 
 # system settings
 customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("blue")
+customtkinter.set_default_color_theme(f"theme/{THEME}.json")
 
 # app frame
 app = customtkinter.CTk()
@@ -329,9 +340,7 @@ app.title("Tube Fetch")
 
 
 iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
-app.after(
-    300, lambda: app.iconphoto(False, iconpath)
-)
+app.after(300, lambda: app.iconphoto(False, iconpath))
 
 Menu()
 
@@ -413,6 +422,7 @@ text = customtkinter.CTkLabel(
 # initialise threads
 download_thread_obj = threading.Thread(target=download_thread)
 search_thread = threading.Thread(target=searchVideo)
+
 
 # run app
 def startMain():
