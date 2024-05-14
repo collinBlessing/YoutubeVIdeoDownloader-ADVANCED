@@ -52,16 +52,18 @@ def on_progress(stream, chunk, bytes_remaining):
 def showSearchingText():
     text.configure(text="searching", text_color="black", bg_color="yellow")
     text.place(x=0, y=30)
-    # Create a new thread for the download process
-    if search_thread.is_alive():
+    global search_thread
+    # Create a new thread for the download process if it's not already running
+    if not search_thread.is_alive():
+        search_thread.start()
+    else:
         userResponse = messagebox.askyesno(
             "Warning",
             "A search is still in progress, are you sure you want to cancel",
         )
         if userResponse:
+            search_thread = threading.Thread(target=searchVideo)
             search_thread.start()
-    else:
-        search_thread.start()
 
 
 # method to search for video existence on YouTube
@@ -118,6 +120,11 @@ def searchVideo():
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
 
+            # 
+            search_thread.join()
+
+
+
         except pytube.exceptions.RegexMatchError:
             text.configure(
                 text="Invalid YouTube link!", text_color="white", bg_color="red"
@@ -150,6 +157,8 @@ def searchVideo():
 
 
 def download_thread():
+    conn = sq.connect("info.db")
+    exc = conn.cursor()
     SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
     try:
         if my_option.get() == "mp3":
@@ -169,6 +178,7 @@ def download_thread():
                     text="Audio download Complete", text_color="white", bg_color="green"
                 )
                 text.place(x=0, y=30)
+                download_thread_obj.join()
 
                 # remove progress bar
                 pPercentage.pack_forget()
@@ -195,6 +205,7 @@ def download_thread():
                 text="Video download Complete", text_color="white", bg_color="green"
             )
             text.place(x=0, y=30)
+            download_thread_obj.join()
 
             # remove progress bar
             pPercentage.pack_forget()
@@ -222,16 +233,18 @@ def download_thread():
 
 
 def startDownload():
-    # Create a new thread for the download process
-    if download_thread_obj.is_alive():
+    global download_thread_obj
+    # Create a new thread for the download process if it's not already running
+    if not download_thread_obj.is_alive():
+        download_thread_obj.start()
+    else:
         userResponse = messagebox.askyesno(
             "Warning",
             "A download is still in progress, are you sure you want to cancel",
         )
         if userResponse:
+            download_thread_obj = threading.Thread(target=download_thread)
             download_thread_obj.start()
-    else:
-        download_thread_obj.start()
 
     # Update GUI elements (if needed)
     pPercentage.pack(padx=5, pady=5)
@@ -354,7 +367,7 @@ customtkinter.set_default_color_theme(f"theme/{THEME}.json")
 
 # app frame
 app = customtkinter.CTk()
-app.geometry("720x480")
+app.geometry("800x600")
 app.resizable(0, 0)
 app.title("Tube Fetch")
 
@@ -435,7 +448,7 @@ searching_text = customtkinter.CTkLabel(
     app, text="Searching......", text_color="yellow"
 )
 text = customtkinter.CTkLabel(
-    app, text="searching", text_color="black", width=720, bg_color="yellow"
+    app, text="searching", text_color="black", width=800, bg_color="yellow"
 )
 
 
