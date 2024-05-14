@@ -23,7 +23,6 @@ import sqlite3 as sq
 conn = sq.connect("info.db")
 exc = conn.cursor()
 
-SAVE_PATH = "/home/collyne/Downloads"
 YT_OBJECT = None
 VIDEO_FOUND = None
 THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
@@ -151,6 +150,7 @@ def searchVideo():
 
 
 def download_thread():
+    SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
     try:
         if my_option.get() == "mp3":
             audio_stream = YT_OBJECT.streams.filter(only_audio=True).first()
@@ -299,6 +299,7 @@ def displayImage_and_details():
 
 def opendownloadsFolder():
     system = platform.system()
+    SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
     if system == "Windows":
         # Replace <Username> with your actual username
         subprocess.Popen(f'explorer /select, "{SAVE_PATH}"')

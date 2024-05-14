@@ -32,9 +32,6 @@ def Preferences():
         else:
             NEW_AUTO_SAVE_STATE = "false"
 
-        print(CURRENT_AUTO_SAVE_STATE)
-        print(NEW_AUTO_SAVE_STATE)
-
         if (
             NEW_THEME != CURRENT_THEME
             or CURRENT_SAVE_PATH != NEW_SAVE_PATH
@@ -65,23 +62,23 @@ def Preferences():
             )
             text.place(x=0, y=0)
 
-        if theme_changed:
-            theme_changed = False
-            # Create a temporary Toplevel window to be able to use lift()
-            top = tk.Toplevel()
-            top.lift()
-            top.attributes("-topmost", True)  # Make the topmost window
-            top.withdraw()  # Hide the top window
+            if theme_changed:
+                theme_changed = False
+                # Create a temporary Toplevel window to be able to use lift()
+                top = tk.Toplevel()
+                top.lift()
+                top.attributes("-topmost", True)  # Make the topmost window
+                top.withdraw()  # Hide the top window
 
-            user_response = messagebox.askyesno(
-                "Restart Required",
-                "The theme has been updated, but the changes won't take effect until the program is restarted. Would you like to restart now?",parent=top
-            )
-            top.destroy()
-            if user_response:
-                restart_program()
-            else:
-                preferences_window.lift()
+                user_response = messagebox.askyesno(
+                    "Restart Required",
+                    "The theme has been updated, but the changes won't take effect until the program is restarted. Would you like to restart now?",parent=top
+                )
+                top.destroy()
+                if user_response:
+                    restart_program()
+                else:
+                    preferences_window.lift()
 
         else:
             text.configure(
@@ -92,8 +89,14 @@ def Preferences():
         #
 
     def chooseSelection():
-        new_path = "{}".format(askdirectory(title="Choose directrory", mustexist=True))
-        download_folder_location.configure(text=new_path)
+        top = tk.Toplevel()
+        top.lift()
+        top.attributes("-topmost", True)  # Make the topmost window
+        top.withdraw()
+        new_path = "{}".format(askdirectory(title="Choose directrory", mustexist=True, parent=top))
+        if new_path != '()':
+            download_folder_location.configure(text=new_path)
+        top.destroy()
 
 
     preferences_window = ctk.CTkToplevel()
@@ -117,9 +120,10 @@ def Preferences():
     download_folder_label = ctk.CTkLabel(downloadFolder, text="Download Folder:")
     download_folder_label.pack(side="left", padx=10, pady=10)
     # Labels
+    SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
     download_folder_location = ctk.CTkLabel(
         downloadFolder,
-        text="/home/collyne/downloads",
+        text=SAVE_PATH,
         wraplength=150,
         text_color="green",
     )
@@ -156,6 +160,11 @@ def Preferences():
     automatic_download = ctk.CTkCheckBox(
         preferences_window, text="start downloading files automatically"
     )
+    CURRENT_AUTO_SAVE_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
+    
+    if CURRENT_AUTO_SAVE_STATE == "true":
+        automatic_download.select()
+
     automatic_download.pack(padx=(10, 60), pady=10)
 
     # save button
