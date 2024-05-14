@@ -1,3 +1,5 @@
+import platform
+import subprocess
 import webbrowser
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -288,9 +290,19 @@ def displayImage_and_details():
 
 # menu commands
 
-
 def opendownloadsFolder():
-    webbrowser.open(SAVE_PATH)
+    system = platform.system()
+    if system == "Windows":
+        # Replace <Username> with your actual username
+        subprocess.Popen(f'explorer /select, "{SAVE_PATH}"')
+    elif system == "Darwin":  # macOS
+        # macOS typically opens the Downloads folder with this command
+        subprocess.Popen(['open', SAVE_PATH])
+    elif system == "Linux":
+        # Linux typically opens the Downloads folder with this command
+        subprocess.Popen(['xdg-open', SAVE_PATH])
+    else:
+        print("Unsupported operating system.")
 
 
 def closeProgram():
