@@ -15,6 +15,7 @@ from pytube import YouTube
 
 from menu_spawn import *
 
+from utils import restart_program
 
 import sqlite3 as sq
 
@@ -31,11 +32,6 @@ THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
 
 import sys
-
-
-def restart_program():
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
 
 
 # noinspection PyUnresolvedReferences

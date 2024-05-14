@@ -4,7 +4,7 @@ import os
 from tkinter.filedialog import askdirectory
 import webbrowser
 import sqlite3 as sq
-
+from utils import restart_program
 
 conn = sq.connect("info.db")
 exc = conn.cursor()
@@ -12,7 +12,7 @@ exc = conn.cursor()
 
 def Preferences():
     def saveChanges():
-
+        theme_changed = False
         # save theme
         CURRENT_THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
         NEW_THEME = themeOptions.get()
@@ -44,6 +44,7 @@ def Preferences():
                 exc.execute(
                     "UPDATE theme SET current_theme = ? WHERE ID = 1", (NEW_THEME,)
                 )
+                theme_changed = True
 
             if CURRENT_SAVE_PATH != NEW_SAVE_PATH:
                 exc.execute(
@@ -56,12 +57,17 @@ def Preferences():
                     (NEW_AUTO_SAVE_STATE,),
                 )
 
+
+
             conn.commit()
 
             text.configure(
                 text="Changes saved successfully", bg_color="green", text_color="white"
             )
             text.place(x=0, y=0)
+
+            if theme_changed:
+                restart_program()
         else:
             text.configure(
                 text="No changes to make", bg_color="yellow", text_color="black"
