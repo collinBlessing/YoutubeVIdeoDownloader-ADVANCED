@@ -55,6 +55,7 @@ def showSearchingText():
     global search_thread
     # Create a new thread for the download process if it's not already running
     if not search_thread.is_alive():
+        search_thread = threading.Thread(target=searchVideo)
         search_thread.start()
     else:
         userResponse = messagebox.askyesno(
@@ -120,11 +121,6 @@ def searchVideo():
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
 
-            # 
-            search_thread.join()
-
-
-
         except pytube.exceptions.RegexMatchError:
             text.configure(
                 text="Invalid YouTube link!", text_color="white", bg_color="red"
@@ -178,7 +174,6 @@ def download_thread():
                     text="Audio download Complete", text_color="white", bg_color="green"
                 )
                 text.place(x=0, y=30)
-                download_thread_obj.join()
 
                 # remove progress bar
                 pPercentage.pack_forget()
@@ -205,7 +200,6 @@ def download_thread():
                 text="Video download Complete", text_color="white", bg_color="green"
             )
             text.place(x=0, y=30)
-            download_thread_obj.join()
 
             # remove progress bar
             pPercentage.pack_forget()
@@ -224,7 +218,9 @@ def download_thread():
 
     except Exception as e:
         # show message
-        text.configure(text="An error occurred !", text_color="white", bg_color="red")
+        text.configure(
+            text="An error occurred !" + str(e), text_color="white", bg_color="red"
+        )
         text.place(x=0, y=30)
         print(e)
 
@@ -236,6 +232,7 @@ def startDownload():
     global download_thread_obj
     # Create a new thread for the download process if it's not already running
     if not download_thread_obj.is_alive():
+        download_thread_obj = threading.Thread(target=download_thread)
         download_thread_obj.start()
     else:
         userResponse = messagebox.askyesno(
