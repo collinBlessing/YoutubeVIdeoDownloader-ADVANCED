@@ -26,6 +26,8 @@ exc = conn.cursor()
 YT_OBJECT = None
 VIDEO_FOUND = None
 THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
+AUTO_DONWLOAD_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
+print(AUTO_DONWLOAD_STATE)
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
@@ -120,6 +122,10 @@ def searchVideo():
             # display download button
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
+
+            # start auto donwload if set to true 
+            if AUTO_DONWLOAD_STATE == 'true':
+                startDownload()
 
         except pytube.exceptions.RegexMatchError:
             text.configure(
