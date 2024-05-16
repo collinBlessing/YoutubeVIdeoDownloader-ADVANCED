@@ -29,11 +29,8 @@ YT_OBJECT = None
 VIDEO_FOUND = None
 
 THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
-AUTO_DONWLOAD_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
-NOTIFICATION_STATE = exc.execute(
-    "SELECT notification_state from notification"
-).fetchone()[0]
 
+AUTO_DOWNLOAD_STATE = None
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
 
@@ -59,6 +56,8 @@ def on_progress(stream, chunk, bytes_remaining):
 def showSearchingText():
     text.configure(text="searching", text_color="black", bg_color="yellow")
     text.place(x=0, y=30)
+    global AUTO_DONWLOAD_STATE
+    AUTO_DONWLOAD_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
     global search_thread
     # Create a new thread for the download process if it's not already running
     if not search_thread.is_alive():
@@ -375,7 +374,7 @@ def Menu():
     dropdown3.add_option(option="Preferences", command=lambda: Preferences())
 
     dropdown4 = CustomDropdownMenu(widget=button_4)
-    dropdown4.add_option(option="Check for updates")
+    # dropdown4.add_option(option="Check for updates")
     dropdown4.add_option(option="About", command=lambda: About())
 
 
