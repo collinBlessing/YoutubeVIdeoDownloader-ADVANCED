@@ -3,16 +3,15 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 ICON_PATH = BASE_DIR +'/assets/logo.png'
-print(ICON_PATH)
 
-def showNotification():
+def showNotification(message):
     # Initialize the notification system
-    notify2.init("Download Complete")
+    notify2.init("Tube Fetch")
 
     # Create a new notification with icon
     notification = notify2.Notification(
-        "TubeFetch",
-        "<b>Donwload completed </b>",
+        "DOnwload Complete",
+        f"<b>{message}</b>",
         ICON_PATH
     )
 
@@ -25,5 +24,3 @@ def showNotification():
     # Show the notification
     notification.show()
 
-
-showNotification()

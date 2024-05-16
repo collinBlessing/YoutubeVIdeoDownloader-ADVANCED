@@ -27,10 +27,12 @@ exc = conn.cursor()
 
 YT_OBJECT = None
 VIDEO_FOUND = None
+
 THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
 AUTO_DONWLOAD_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
-NOTIFICATION_STATE = exc.execute("SELECT notification_state from notification").fetchone()[0]
-
+NOTIFICATION_STATE = exc.execute(
+    "SELECT notification_state from notification"
+).fetchone()[0]
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
@@ -126,8 +128,8 @@ def searchVideo():
             button_frame.pack(pady=10)  # embedd frame
             button_download.pack(side="left", padx=5)
 
-            # start auto donwload if set to true 
-            if AUTO_DONWLOAD_STATE == 'true':
+            # start auto donwload if set to true
+            if AUTO_DONWLOAD_STATE == "true":
                 startDownload()
 
         except pytube.exceptions.RegexMatchError:
@@ -164,7 +166,11 @@ def searchVideo():
 def download_thread():
     conn = sq.connect("info.db")
     exc = conn.cursor()
+
     SAVE_PATH = exc.execute("SELECT download_path from path").fetchone()[0]
+    NOTIFICATION_STATE = exc.execute(
+        "SELECT notification_state from notification"
+    ).fetchone()[0]
     try:
         if my_option.get() == "mp3":
             audio_stream = YT_OBJECT.streams.filter(only_audio=True).first()
@@ -183,12 +189,12 @@ def download_thread():
                     text="Audio download Complete", text_color="white", bg_color="green"
                 )
                 text.place(x=0, y=30)
-
-                if NOTIFICATION_STATE == 'true':
-                    notify.showNotification()
+                if NOTIFICATION_STATE == "true":
+                    notify.showNotification(YT_OBJECT.title + '.mp3')
                 # remove progress bar
                 pPercentage.pack_forget()
                 progressBar.pack_forget()
+
                 return
             else:
                 # show message
@@ -212,6 +218,12 @@ def download_thread():
             )
             text.place(x=0, y=30)
 
+            # remove progress bar
+            pPercentage.pack_forget()
+            progressBar.pack_forget()
+
+            if NOTIFICATION_STATE == "true":
+                notify.showNotification(YT_OBJECT.title + ".mp3")
             # remove progress bar
             pPercentage.pack_forget()
             progressBar.pack_forget()
