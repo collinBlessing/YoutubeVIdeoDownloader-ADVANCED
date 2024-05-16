@@ -19,6 +19,8 @@ from utils import restart_program
 
 import sqlite3 as sq
 
+import notify
+
 # conn = sq.connect(':memory:')
 conn = sq.connect("info.db")
 exc = conn.cursor()
@@ -27,7 +29,8 @@ YT_OBJECT = None
 VIDEO_FOUND = None
 THEME = exc.execute("SELECT current_theme from theme").fetchone()[0]
 AUTO_DONWLOAD_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
-print(AUTO_DONWLOAD_STATE)
+NOTIFICATION_STATE = exc.execute("SELECT notification_state from notification").fetchone()[0]
+
 
 
 # https://youtu.be/c4l8e7pJCsA?si=ZwVzSDLLbwSu5QYR
@@ -181,6 +184,8 @@ def download_thread():
                 )
                 text.place(x=0, y=30)
 
+                if NOTIFICATION_STATE == 'true':
+                    notify.showNotification()
                 # remove progress bar
                 pPercentage.pack_forget()
                 progressBar.pack_forget()
