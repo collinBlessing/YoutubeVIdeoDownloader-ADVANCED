@@ -26,16 +26,27 @@ def Preferences():
             "SELECT auto_download from path"
         ).fetchone()[0]
 
+        CURRENT_NOTIFICATION_STATE = exc.execute(
+            "SELECT notification_state from notification"
+        ).fetchone()[0]
+
         # set state from the check
         if automatic_download.get():
             NEW_AUTO_SAVE_STATE = "true"
         else:
             NEW_AUTO_SAVE_STATE = "false"
 
+        # set notification state from the check
+        if notification_state.get():
+            NEW_NOTIFICATION_STATE = "true"
+        else:
+            NEW_NOTIFICATION_STATE = "false"
+
         if (
             NEW_THEME != CURRENT_THEME
             or CURRENT_SAVE_PATH != NEW_SAVE_PATH
             or CURRENT_AUTO_SAVE_STATE != NEW_AUTO_SAVE_STATE
+            or CURRENT_NOTIFICATION_STATE != NEW_NOTIFICATION_STATE
         ):
 
             if NEW_THEME != CURRENT_THEME:
@@ -53,6 +64,12 @@ def Preferences():
                 exc.execute(
                     "UPDATE path SET auto_download = ? WHERE ID = 1",
                     (NEW_AUTO_SAVE_STATE,),
+                )
+
+            if CURRENT_NOTIFICATION_STATE != NEW_NOTIFICATION_STATE:
+                exc.execute(
+                    "UPDATE notification SET notification_state = ? WHERE ID = 1",
+                    (NEW_NOTIFICATION_STATE,),
                 )
 
             conn.commit()
@@ -98,14 +115,12 @@ def Preferences():
             download_folder_location.configure(text=new_path)
         top.destroy()
 
-
     preferences_window = ctk.CTkToplevel()
-    preferences_window.geometry("600x320")
+    preferences_window.geometry("600x350")
     preferences_window.title("Preferences")
     iconpath = ImageTk.PhotoImage(file=os.path.join("assets", "logo.png"))
     preferences_window.after(300, lambda: preferences_window.iconphoto(False, iconpath))
     preferences_window.resizable(0, 0)
-    # preferences_window.protocol("WM_DELETE_WINDOW", close_main_window)
 
     # unsaved changes
     text = ctk.CTkLabel(
@@ -145,6 +160,7 @@ def Preferences():
     themeText.pack(side="left", padx=(10, 60), pady=10)
 
     # TODO: fix error on about page on the icon
+
     # options
 
     themes = ["marsh", "metal", "pink", "red", "violet", "yellow"]
@@ -161,11 +177,22 @@ def Preferences():
         preferences_window, text="start downloading files automatically"
     )
     CURRENT_AUTO_SAVE_STATE = exc.execute("SELECT auto_download from path").fetchone()[0]
-    
+
     if CURRENT_AUTO_SAVE_STATE == "true":
         automatic_download.select()
 
     automatic_download.pack(padx=(10, 60), pady=10)
+
+    # Notification state set
+    notification_state = ctk.CTkCheckBox(
+        preferences_window, text="Show notifications after download"
+    )
+    CURRENT_NOTIFICATION_STATE = exc.execute("SELECT notification_state from notification").fetchone()[0]
+
+    if CURRENT_NOTIFICATION_STATE == "true":
+        notification_state.select()
+
+    notification_state.pack(padx=(10, 60), pady=10)
 
     # save button
     saveButton = ctk.CTkButton(preferences_window, text="Save", command=saveChanges)

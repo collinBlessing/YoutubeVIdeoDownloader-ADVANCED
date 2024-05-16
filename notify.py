@@ -10,7 +10,7 @@ def showNotification(message):
 
     # Create a new notification with icon
     notification = notify2.Notification(
-        "DOnwload Complete",
+        "Download Complete",
         f"<b>{message}</b>",
         ICON_PATH
     )
